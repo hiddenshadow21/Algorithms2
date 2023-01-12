@@ -7,4 +7,6 @@ using labCS;
 //new Zad5Test().Start();
 //new Zad9().Start();
 //new Zad8().Start();
-StronglyConnectedComponents.Start();
+//StronglyConnectedComponents.Start();
+//Zad7.Start();
+FordFulkerson.Start();
