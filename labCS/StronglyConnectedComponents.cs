@@ -53,7 +53,7 @@ class StronglyConnectedComponents
         }
 
         // If v is the root of an SCC
-        var stackRoot = _stack.Reverse().ToArray()[0];
+        var stackRoot = _stack.Reverse().First();
         
         if (stackRoot == v)
         {
