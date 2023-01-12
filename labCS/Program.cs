@@ -6,4 +6,5 @@ using labCS;
 //new Zad6(Path.Combine("..", "..", "..", "graph.txt")).Start();
 //new Zad5Test().Start();
 //new Zad9().Start();
-new Zad8().Start();
+//new Zad8().Start();
+StronglyConnectedComponents.Start();
