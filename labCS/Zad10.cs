@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 class FordFulkerson
 {
-    private int _v;
+    private readonly int _v;
     private readonly int[,] _graph;
     private int[,] _rG;
     private int[] _parent;
