@@ -6,10 +6,11 @@ using System.Collections.Generic;
 class StronglyConnectedComponents
 {
     // Number of vertices
-    private readonly int _v;
+    private int _v;
 
     // Array of lists for Adjacency List Representation
-    private readonly List<int>[] _adj;
+    private List<int>[] _adj;
+    private List<int>[] _transposedAdj;
 
     // DFS stack
     private Stack<int> _stack;
@@ -21,29 +22,37 @@ class StronglyConnectedComponents
     private List<List<int>> _sccs;
 
     // Function that returns the strongly connected components
-    public List<List<int>> GetSccs()
+    public List<List<int>> GetScCs()
     {
         _sccs = new List<List<int>>();
         _stack = new Stack<int>();
         _visited = new bool[_v];
 
-        // Initialize all vertices as not visited
-        for (var i = 0; i < _v; i++)
-            _visited[i] = false;
-
-        // Call the DFS function for each vertex
+        // First DFS traversal to fill stack with vertex in decreasing order of finish time
         for (var i = 0; i < _v; i++)
             if (!_visited[i])
                 Dfs(i);
 
+        // Second DFS traversal to find SCCs
+        _visited = new bool[_v];
+        while (_stack.Count > 0)
+        {
+            var v = _stack.Pop();
+            if (!_visited[v])
+            {
+                var scc = new List<int>();
+                Dfs2(v, scc);
+                _sccs.Add(scc);
+            }
+        }
+
         return _sccs;
     }
 
-    // A recursive function to print DFS starting from v
+// A recursive function to perform DFS traversal
     private void Dfs(int v)
     {
         _visited[v] = true;
-        _stack.Push(v);
 
         // Recur for all the vertices adjacent to this vertex
         foreach (var w in _adj[v])
@@ -52,65 +61,63 @@ class StronglyConnectedComponents
                 Dfs(w);
         }
 
-        // If v is the root of an SCC
-        var stackRoot = _stack.Reverse().First();
-        
-        if (stackRoot == v)
-        {
-            var scc = new List<int>();
-            int w;
-            do
-            {
-                w = _stack.Pop();
-                scc.Add(w);
-            } while (w != v);
+        // Push current vertex to stack
+        _stack.Push(v);
+    }
 
-            _sccs.Add(scc);
+// A recursive function to perform DFS traversal on transposed graph
+    private void Dfs2(int v, List<int> scc)
+    {
+        _visited[v] = true;
+        scc.Add(v);
+
+        // Recur for all the vertices adjacent to this vertex
+        foreach (var w in _transposedAdj[v])
+        {
+            if (!_visited[w])
+                Dfs2(w, scc);
         }
     }
 
-    // Constructor
+// Constructor
     public StronglyConnectedComponents(int v, List<int>[] edges)
     {
         _v = v;
         _adj = edges;
+
+        _transposedAdj = new List<int>[v];
+        for (var i = 0; i < v; i++)
+            _transposedAdj[i] = new List<int>();
+
+        for (var i = 0; i < v; i++)
+            foreach (var j in edges[i])
+                _transposedAdj[j].Add(i);
     }
 
     public static void Start()
     {
-        // Number of vertices
-        var v = 8;
-
-// Array of lists for Adjacency List Representation
-        List<int>[] edges = new List<int>[v];
-        for (var i = 0; i < v; i++)
-            edges[i] = new List<int>();
-
-// Add edges to the graph
-        edges[0].Add(1);
-        edges[1].Add(0);
-        edges[2].Add(4);
-        edges[2].Add(7);
-        edges[3].Add(2);
-        edges[4].Add(3);
-        edges[5].Add(4);
-        edges[5].Add(6);
-        edges[6].Add(5);
-        edges[7].Add(4);
-
-// Create an instance of the class
-        var scc = new StronglyConnectedComponents(v, edges);
-
-// Get the strongly connected components
-        List<List<int>> result = scc.GetSccs();
-
-// Print the strongly connected components
-        foreach (var sccl in result)
+        var edges = new List<int>[]
         {
-            Console.Write("SCC: ");
-            foreach (var vertex in sccl)
-                Console.Write(vertex + " ");
-            Console.WriteLine();
+            new()
+            {
+                2, 3
+            },
+            new()
+            {
+                0
+            },
+            new()
+            {
+                1
+            },
+            new() {4},
+            new()
+        };
+
+        var sccs = new StronglyConnectedComponents(5, edges).GetScCs();
+        foreach (var scc in sccs)
+        {
+            Console.WriteLine(string.Join(' ', scc));
         }
     }
 }
